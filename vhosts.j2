@@ -1,15 +1,15 @@
-{%- for host in vhosts -%}
-<VirtualHost *:80>
-  ServerName {{ host.server_name }}
-  DocumentRoot {{ host.document_root }}
-  ServerAdmin {{ host.server_admin }}
-{% if host.directory %}
-  <Directory "{{ host.directory }}">
-     AllowOverride All
-     Options Indexes FollowSymLinks
-     Order allow,deny
-     Allow from all
+{% for vhost in vhosts %}
+    {% if vhost.port == 80 %}
+<VirtualHost *:{{ vhost.port | default('80') }}>
+  ServerName {{ vhost.server_name }}
+  DocumentRoot {{ vhost.document_root }}
+  ServerAdmin {{ vhost.server_admin }}
+  <Directory "{{ vhost.directory.path }}">
+     AllowOverride {{ vhost.directory.allow_override | default('All') }}
+     Options {{ vhost.directory.options | default('Indexes FollowSymLinks') }}
+     Order {{ vhost.directory.order | default('allow,deny') }}
+     Allow {{ vhost.directory.allow | default('from all') }}
   </Directory>
-{% endif %}
 </VirtualHost>
+    {% endif %}
 {% endfor %}
